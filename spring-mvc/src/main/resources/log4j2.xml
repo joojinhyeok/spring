@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Configuration>
+
+    <!-- Appender, Layout 설정 -->
+    <Appenders>
+        <Console name="console" target="SYSTEM_OUT">
+            <PatternLayout pattern=" %-5level %c(%M:%L) - %m%n"/>
+        </Console>
+    </Appenders>
+
+
+
+    <!-- Logger 설정 -->
+    <!--  -->
+    <Loggers>
+        <!--
+            [로그 레벨 종류 - 낮은 → 높은]
+
+            TRACE : 가장 상세한 로그 (변수 추적, 흐름 등 디버깅용)
+            DEBUG : 개발 중 로직 흐름 확인용
+            INFO  : 일반적인 정보 (처리 완료, 상태 출력 등)
+            WARN  : 문제 가능성 있는 상황 (주의 요망)
+            ERROR : 에러 발생 (예외 처리, 기능 실패 등)
+            FATAL : 치명적인 에러 (애플리케이션 중단 위험)
+            OFF   : 로그 출력 안 함
+        -->
+        <Root level="INFO">
+            <AppenderRef ref="console"/>
+        </Root>
+        <Logger name="org.scoula" level="INFO" additivity="false" >
+            <AppenderRef ref="console"/>
+        </Logger>
+
+        <Logger name="org.springframework" level="INFO" additivity="false">
+            <AppenderRef ref="console"/>
+        </Logger>
+    </Loggers>
+
+</Configuration>

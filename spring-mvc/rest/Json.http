@@ -1,0 +1,14 @@
+### [GET] / ex01 - @ResponseBody 로 DTO(JSON) 응답
+GET http://localhost:8080/json/ex01
+
+### [POST] / ex02 - JSON 본문 보내서 응답 문자열 받기
+POST http://localhost:8080/json/ex02
+Content-Type: application/json
+
+{
+  "id": "user",
+  "password": "password"
+}
+
+### [GET] /ex03
+GET http://localhost:8080/json/ex03
