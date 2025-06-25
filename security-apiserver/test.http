@@ -1,0 +1,19 @@
+### 성공로그인요청
+POST http://localhost:8080/api/auth/login
+Content-Type: application/json
+
+{
+  "username": "user0",
+  "password": "1234"
+}
+
+### eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ1c2VyMCIsImlhdCI6MTc1MDgzMDYyOCwiZXhwIjoxNzUwODMwOTI4fQ.zJfUMeeaw53pfEalZaDWFCe2IZdxPy4vsH6K1wyDgs0
+
+### 실패 로그인 요청
+POST http://localhost:8080/api/auth/login
+Content-Type: application/json
+
+{
+"username": "user0",
+  "password": "12345"
+}
