@@ -7,7 +7,8 @@ Content-Type: application/json
   "password": "1234"
 }
 
-### eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ1c2VyMCIsImlhdCI6MTc1MDgzMDYyOCwiZXhwIjoxNzUwODMwOTI4fQ.zJfUMeeaw53pfEalZaDWFCe2IZdxPy4vsH6K1wyDgs0
+### eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ1c2VyMCIsImlhdCI6MTc1MDkxNDUyNSwiZXhwIjoxNzUwOTE0ODI1fQ.fMxoWs2dGIV9eMjVQv6pqi_Y4RaYXDGTPakSGRxntgc
+
 
 ### 실패 로그인 요청
 POST http://localhost:8080/api/auth/login
@@ -17,3 +18,16 @@ Content-Type: application/json
 "username": "user0",
   "password": "12345"
 }
+
+### 보호된 API 접근 시도 (예: 인증 필요 API)
+GET http://localhost:8080/api/security/member
+Authorization: Bearer eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ1c2VyMCIsImlhdCI6MTc1MDgzNTM0MywiZXhwIjoxNzUwODM1NjQzfQ.G4_sxRVTExOwWEZelxW7URoLUQUPgveMa7J9f4p2P3Q
+
+### 공개 엔드포인트 접근
+GET http://localhost:8080/api/security/all
+
+
+### 토큰을 포함한 요청
+GET http://localhost:8080/api/security/member
+Authorization: Bearer eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ1c2VyMCIsImlhdCI6MTc1MDkxNDUyNSwiZXhwIjoxNzUwOTE0ODI1fQ.fMxoWs2dGIV9eMjVQv6pqi_Y4RaYXDGTPakSGRxntgc
+

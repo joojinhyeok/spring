@@ -4,9 +4,16 @@ package org.scoula.security.config;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import org.mybatis.spring.annotation.MapperScan;
+import org.scoula.security.filter.AuthenticationErrorFilter;
+import org.scoula.security.filter.JwtAuthenticationFilter;
+import org.scoula.security.filter.JwtUsernamePasswordAuthenticationFilter;
+import org.scoula.security.handle.CustomAccessDeniedHandler;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpMethod;
+import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
@@ -14,6 +21,7 @@ import org.springframework.security.config.annotation.web.configuration.WebSecur
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.security.web.csrf.CsrfFilter;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
@@ -33,6 +41,20 @@ import java.util.Arrays;
 public class SecurityConfig extends WebSecurityConfigurerAdapter {
 
     private final UserDetailsService userDetailsService;
+    private final CustomAccessDeniedHandler accessDeniedHandler;
+    private final org.scoula.security.handle.CustomAuthenticationEntryPoint authenticationEntryPoint;
+    private final AuthenticationErrorFilter authenticationErrorFilter;
+
+    @Autowired
+    private JwtAuthenticationFilter authenticationFilter;
+
+
+
+    // 커스텀 인증 필터 추가
+    @Autowired
+    private JwtUsernamePasswordAuthenticationFilter jwtUsernamePasswordAuthenticationFilter;
+    @Autowired
+    private JwtAuthenticationFilter jwtAuthenticationFilter;
 
     // 문자셋 필터
     public CharacterEncodingFilter encodingFilter() {
@@ -47,9 +69,35 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
         return new BCryptPasswordEncoder(); // 암호화 시켜주는 역할
     }
 
+    // AuthenticationManager 빈 등록
+    @Bean
+    public AuthenticationManager authenticationManager() throws Exception {
+        return super.authenticationManager();
+    }
+
     @Override
     protected void configure(HttpSecurity http) throws Exception{
-        http.addFilterBefore(encodingFilter(), CsrfFilter.class);
+        http
+//              .addFilterBefore(encodingFilter(), CsrfFilter.class);
+                // token 인증 필터
+                .addFilterBefore(jwtAuthenticationFilter,
+                        UsernamePasswordAuthenticationFilter.class)
+
+                // login 필터
+                .addFilterBefore(jwtUsernamePasswordAuthenticationFilter,
+                        UsernamePasswordAuthenticationFilter.class)
+
+                // 토큰 인증시 발생하는 예외 처리 필터
+                .addFilterBefore(authenticationErrorFilter, JwtAuthenticationFilter.class)
+
+        // 예외 처리 설정
+            .exceptionHandling()
+                .authenticationEntryPoint(authenticationEntryPoint)  // 401 에러 처리
+                .accessDeniedHandler(accessDeniedHandler);           // 403 에러 처리
+
+        http
+                // API 로그인 인증 필터 추가 (기존 UsernamePasswordAuthenticationFilter 앞에 배치)
+                .addFilterBefore(jwtUsernamePasswordAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
 
         //  HTTP 보안 설정
         http.httpBasic().disable()      // 기본 HTTP 인증 비활성화
@@ -58,33 +106,26 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 .sessionManagement()        // 세션 관리 설정
                 .sessionCreationPolicy(SessionCreationPolicy.STATELESS);  // 무상태 모드
 
-        // 경로별, 권한별 설정
-        http.authorizeRequests()
-                .antMatchers("/security/all").permitAll()    // 모든권한 접근 허용
-                .antMatchers("/security/admin").access("hasRole('ROLE_ADMIN')")
-                .antMatchers("/security/member").access("hasAnyRole('ROLE_MEMBER')");
-        
+
+        http
+                    .authorizeRequests() // 경로별 접근 권한 설정
+                    .antMatchers(HttpMethod.OPTIONS).permitAll()
+                    .antMatchers("/api/security/all").permitAll()                    // 모두 허용
+                    .antMatchers("/api/security/member").access("hasRole('ROLE_MEMBER')")  // ROLE_MEMBER 이상
+                    .antMatchers("/api/security/admin").access("hasRole('ROLE_ADMIN')")    // ROLE_ADMIN 이상
+                    .anyRequest().authenticated(); // 나머지는 로그인 필요
+
         http.formLogin()   // form 기반 로그인 활성화
                 .loginPage("/security/login")   // 사용자가 보게될 로그인 페이지(우리가 만든것)
                 .loginProcessingUrl("/security/login")  //
                 .defaultSuccessUrl("/");
-
-        http.logout()
-                .logoutUrl("/security/logout")  // Spring Security에서 로그아웃 요청을 받는 POST API
-                .invalidateHttpSession(true)
-                .deleteCookies("JESSION-ID")
-                .logoutSuccessUrl("/security/logout");  // GET logout 페이지 전환
 
         http.sessionManagement()
                 .maximumSessions(1)                        // 동시 세션 수 제한
                 .maxSessionsPreventsLogin(false)           // 새 로그인시 기존 세션 만료
                 .expiredUrl("/security/login?expired");    // 세션 만료시 리다이렉트
 
-        http.rememberMe()
-                .key("uniqueAndSecret")                    // 🔑 암호화 키
-                .tokenValiditySeconds(86400)               // ⏰ 24시간 유효
-                .userDetailsService(userDetailsService);   // 👤 사용자 정보 서비스
-    }
+}
 
 //    @Override
 //    protected void configure(AuthenticationManagerBuilder auth)throws Exception {

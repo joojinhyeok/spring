@@ -1,4 +1,4 @@
-package org.scoula.security.handler;
+package org.scoula.security.handle;
 
 import org.scoula.security.util.JsonResponse;
 import org.springframework.http.HttpStatus;

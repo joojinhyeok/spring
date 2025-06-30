@@ -31,6 +31,17 @@ public class JwtProcessor {
                 .signWith(key)    // 서명
                 .compact();       // 문자열 생성
     }
+
+    // 토큰 만들기
+    // subject: 사용자 식별값 (username)
+    public String generateTokenByLogin(String subject){
+        return Jwts.builder()
+                .setSubject(subject) // 사용자 식별자
+                .setIssuedAt(new Date()) // 발급시간
+                .setExpiration(new Date(new Date().getTime() + TOKEN_VALID_MILLISECOND))    // 만료시간
+                .signWith(key)    // 서명
+                .compact();       // 문자열 생성
+    }
     
     // 검증
     // Subject -> 사용자 식별자 (사용자 정보중 고유한 값)
