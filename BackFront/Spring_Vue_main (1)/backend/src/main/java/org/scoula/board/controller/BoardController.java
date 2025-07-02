@@ -4,11 +4,15 @@ package org.scoula.board.controller;
 import io.swagger.annotations.*;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
+import org.scoula.board.domain.BoardAttachmentVO;
 import org.scoula.board.dto.BoardDTO;
 import org.scoula.board.service.BoardService;
+import org.scoula.common.util.UploadFiles;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import javax.servlet.http.HttpServletResponse;
+import java.io.File;
 import java.util.List;
 
 @RestController
@@ -58,7 +62,7 @@ public class BoardController {
     @PostMapping("")
     public ResponseEntity<BoardDTO> create(
             @ApiParam(value = "게시글 객체", required = true)
-            @RequestBody BoardDTO board) {
+            BoardDTO board) {   // @RequestBody 삭제
         return ResponseEntity.ok(service.create(board));
     }
 
@@ -93,4 +97,17 @@ public class BoardController {
         return ResponseEntity.ok(service.delete(no));
     }
 
+    @GetMapping("/download/{no}")
+    public void download(@PathVariable Long no, HttpServletResponse response) throws Exception {
+        BoardAttachmentVO attachment = service.getAttachment(no);
+        File file = new File(attachment.getPath());
+        UploadFiles.download(response, file, attachment.getFilename());
+    }
+
+    @DeleteMapping("/deleteAttachment/{no}")
+    public ResponseEntity<Boolean> deleteAttachment(@PathVariable Long no) throws Exception {
+        return ResponseEntity.ok(service.deleteAttachment(no));
+
+    }
 }
+
