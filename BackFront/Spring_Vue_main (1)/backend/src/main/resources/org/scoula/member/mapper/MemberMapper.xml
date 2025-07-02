@@ -22,6 +22,19 @@
         <result property="updateDate" column="update_date"/>
         <collection property="authList" resultMap="authMap"/>
     </resultMap>
+    <update id="update">
+        UPDATE tbl_member
+        SET email       = #{email},
+            update_date = now()
+        WHERE username = #{username}
+    </update>
+    <update id="updatePassword">
+
+        UPDATE tbl_member
+        SET password    = #{newPassword},
+            update_date = now()
+        WHERE username = #{username}
+    </update>
 
     <!-- SQL -->
     <!-- 회원 정보 조회 (LEFT JOIN으로 권한 정보 포함) -->

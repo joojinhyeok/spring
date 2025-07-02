@@ -122,9 +122,17 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
         http
                 .authorizeRequests()
                 .antMatchers(HttpMethod.OPTIONS).permitAll()
+                .antMatchers(HttpMethod.POST, "/api/member").authenticated()
+                .antMatchers(HttpMethod.PUT, "/api/member", "/api/member/*/changepassword").authenticated()
                 // 일단 모든 접근 허용
+                .anyRequest().permitAll()
+
+                .antMatchers(HttpMethod.POST, "/api/board/**").authenticated()
+                .antMatchers(HttpMethod.PUT, "/api/board/**").authenticated()
+                .antMatchers(HttpMethod.DELETE, "/api/board/**").authenticated()
                 .anyRequest().permitAll();
-        
+
+
         // 경로별 접근권한설정
         // form-login기본 설정은 비활성화되어서 사라짐.
         // 권한이 없으면 403에러 화면이 뜸.
