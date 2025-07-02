@@ -3,13 +3,13 @@
 // useRouter() : 라우터 인스턴스를 반환하는 함수
 // 라우터 인스턴스를 사용하여 페이지 이동 및 라우팅 처리
 import { useRouter } from "vue-router";
-import { useAuthStore } from "@/stores/auth.js"; // <- 추가
+import { useAuthStore } from "@/stores/auth.js";
 
 const router = useRouter();
-const store = useAuthStore(); // <- 추가
+const store = useAuthStore();
 
 const logout = (e) => {
-  // <- 수정
+  // 로그아웃
   store.logout(); // 스토어의 로그아웃 액션 호출
   router.push("/"); // 홈페이지로 이동
 };

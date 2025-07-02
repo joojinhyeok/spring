@@ -1,5 +1,6 @@
 import { ref, computed } from "vue";
 import { defineStore } from "pinia";
+import axios from "@/api";
 
 // 초기 상태 템플릿
 const initState = {
@@ -17,8 +18,10 @@ export const useAuthStore = defineStore("auth", () => {
 
   // Computed 속성들
   const isLogin = computed(() => !!state.value.user.username); // 로그인 여부
-  const username = computed(() => state.value.user.username); // 사용자명
-  const email = computed(() => state.value.user.email); // 이메일
+
+  const username = computed(() => state.value.user.username); // 로그인 사용자 ID
+
+  const email = computed(() => state.value.user.email); // 로그인 사용자 이메일
 
   // isLogin 사용자명 존재 여부로 로그인 상태 판단
   // username, email 반응형 데이터로 컴포넌트에서 자동 업데이트
@@ -29,14 +32,23 @@ export const useAuthStore = defineStore("auth", () => {
   // 로그인 액션
   const login = async (member) => {
     // 임시 테스트용 로그인 (실제 API 호출 전)
-    state.value.token = "test token";
-    state.value.user = {
-      username: member.username,
-      email: member.username + "@test.com",
-    };
+    // state.value.token = "test token";
+    // state.value.user = {
+    //   username: member.username,
+    //   email: member.username + "@test.com",
+    // };
 
-    // localStorage에 상태 저장
-    localStorage.setItem("auth", JSON.stringify(state.value));
+    // 로그인 API 호출
+    const { data } = await axios.post("/api/auth/login", member);
+    /*
+     * 백엔드에서는 아래와 같은 필터로 처리:
+     * - 경로: setFilterProcessesUrl("/api/auth/login")
+     * - 성공: setAuthenticationSuccessHandler()
+     * - 실패: setAuthenticationFailureHandler()
+     */
+    state.value = { ...data }; // 응답 데이터 저장
+    console.log(state); // 디버그 출력
+    localStorage.setItem("auth", JSON.stringify(state.value)); // localStorage에 상태 저장
   };
 
   // 로그아웃 액션
@@ -61,6 +73,11 @@ export const useAuthStore = defineStore("auth", () => {
   // 스토어 초기화 시 자동 실행
   load();
 
+  const changeProfile = (member) => {
+    state.value.user.email = member.email;
+    localStorage.setItem('auth', JSON.stringify(state.value))
+  };
+
   // 외부에서 사용할 수 있도록 반환
   return {
     state,
@@ -70,5 +87,6 @@ export const useAuthStore = defineStore("auth", () => {
     login,
     logout,
     getToken,
+    changeProfile,
   };
 });

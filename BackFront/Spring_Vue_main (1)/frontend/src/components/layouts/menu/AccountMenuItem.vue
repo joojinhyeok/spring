@@ -12,3 +12,4 @@ const avatar = `/api/member/${props.username}/avatar`;
     </router-link>
   </li>
 </template>
+<style></style>
