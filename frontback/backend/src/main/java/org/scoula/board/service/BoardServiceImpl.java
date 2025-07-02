@@ -21,26 +21,16 @@ import java.util.Optional;
 @RequiredArgsConstructor
 public class BoardServiceImpl implements BoardService {
 
+    private final static String BASE_DIR = "c:/upload/board";
     final private BoardMapper mapper;
 
     @Override
     public List<BoardDTO> getList() {
         log.info("getList..........");
 
-        return mapper.getList().stream()	// BoardVO의 스트림
-                .map(BoardDTO::of)			// BoardDTO의 스트림
-                .toList();								// List<BoardDTO> 변환
-    }
-
-    @Override
-    public BoardDTO get(Long no) {
-        log.info("get......" + no);
-
-        BoardDTO board = BoardDTO.of(mapper.get(no));
-        return Optional
-                .ofNullable(board)
-                .orElseThrow(NoSuchElementException::new);
-
+        return mapper.getList().stream()    // BoardVO의 스트림
+                .map(BoardDTO::of)            // BoardDTO의 스트림
+                .toList();                                // List<BoardDTO> 변환
     }
 
 //    @Override
@@ -52,7 +42,25 @@ public class BoardServiceImpl implements BoardService {
 //        board.setNo(vo.getNo());
 //    }
 
-    private final static String BASE_DIR = "c:/upload/board";
+    /*
+     * 흐름
+     * - BoardMapper.java로 get요청을 보냄
+     * - BoardMapper.java에서 get(no)를 호출
+     * - BoardMapper.xml에서 쿼리문 실행 -> 원하는 데이터 상세조회
+     * - BoardVO 객체로 매핑되어 반환됨
+     * - BoardDTO에서 .of(vo)를 통해 VO -> DTO로 변환해서 board 변수에 저장
+     * - Optional을 이용해 null 체크 및 예외 처리 후 board 반환
+     * */
+    @Override
+    public BoardDTO get(Long no) {
+        log.info("get......" + no);
+
+        BoardDTO board = BoardDTO.of(mapper.get(no));
+        return Optional
+                .ofNullable(board)
+                .orElseThrow(NoSuchElementException::new);
+
+    }
 
     // 2개 이상의 insert 문이 실행될 수 있으므로 트랜잭션 처리 필요
     // RuntimeException인 경우만 자동 rollback.
@@ -66,7 +74,7 @@ public class BoardServiceImpl implements BoardService {
 
         // 파일 업로드 처리
         List<MultipartFile> files = board.getFiles();
-        if(files != null && !files.isEmpty()) {	// 첨부 파일이 있는 경우
+        if (files != null && !files.isEmpty()) {    // 첨부 파일이 있는 경우
             upload(boardVO.getNo(), files);
         }
 
@@ -74,8 +82,8 @@ public class BoardServiceImpl implements BoardService {
     }
 
     private void upload(Long bno, List<MultipartFile> files) {
-        for(MultipartFile part: files) {
-            if(part.isEmpty()) continue;
+        for (MultipartFile part : files) {
+            if (part.isEmpty()) continue;
             try {
                 String uploadPath = UploadFiles.upload(BASE_DIR, part);
                 BoardAttachmentVO attach = BoardAttachmentVO.of(part, bno, uploadPath);
@@ -104,7 +112,7 @@ public class BoardServiceImpl implements BoardService {
         return board;
     }
 
-        // 첨부파일 한 개 얻기
+    // 첨부파일 한 개 얻기
     @Override
     public BoardAttachmentVO getAttachment(Long no) {
         return mapper.getAttachment(no);
