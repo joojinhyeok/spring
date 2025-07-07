@@ -1,0 +1,1 @@
+import{m as o}from"./index-8tEzo_Yo.js";const n="/api/travel",e={async getList(a){const{data:t}=await o.get(n,{params:a});return console.log("TRAVEL GET LIST: ",t),t},async get(a){const{data:t}=await o.get(`${n}/${a}`);return console.log("TRAVEL GET",t),t}};export{e as a};
