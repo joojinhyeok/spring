@@ -24,16 +24,6 @@
         <collection property="attaches" resultMap="attachmentMap"/>
     </resultMap>
 
-
-    <!--    <insert id="create">-->
-    <!--        insert into tbl_board (title, content, writer)-->
-    <!--        values (#{title}, #{content}, #{writer})-->
-
-    <!--        <selectKey resultType="Long" keyProperty="no" keyColumn="no" order="AFTER">-->
-    <!--            SELECT LAST_INSERT_ID()-->
-    <!--        </selectKey>-->
-    <!--    </insert>-->
-
     <insert id="create">
         insert into tbl_board (title, content, writer)
         values (#{title}, #{content}, #{writer})
@@ -56,12 +46,7 @@
         from tbl_board
         where no = #{no}
     </delete>
-    <!--	<select id="getList" resultType="org.scoula.board.domain.BoardVO">-->
-    <!--		<![CDATA[-->
-    <!--        select * from tbl_board-->
-    <!--        order by no desc-->
-    <!--        ]]>-->
-    <!--	</select>-->
+
     <select id="getList" resultType="BoardVO">
 <![CDATA[
         select *
@@ -69,25 +54,6 @@
         order by no desc
         ]]>
 </select>
-    <!--	<select id="get" resultType="org.scoula.board.domain.BoardVO">-->
-    <!--		select * from tbl_board where no = #{no}-->
-    <!--	</select>-->
-
-    <!--    <select id="get" resultMap="boardMap">-->
-    <!--        select b.*,-->
-    <!--               a.no       as ano,-->
-    <!--               a.bno,-->
-    <!--               a.filename,-->
-    <!--               a.path,-->
-    <!--               a.content_type,-->
-    <!--               a.size,-->
-    <!--               a.reg_date as a_reg_date-->
-    <!--        from tbl_board b-->
-    <!--                 left outer join tbl_board_attachment a-->
-    <!--                                 on b.no = a.bno-->
-    <!--        where b.no = #{no}-->
-    <!--        order by filename-->
-    <!--    </select>-->
 
     <select id="get" resultMap="boardMap">
         select b.*,
